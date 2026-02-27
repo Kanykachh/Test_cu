@@ -1,0 +1,17 @@
+coverage/
+cypress/
+test/
+src/
+public/
+node_modules/
+
+*.log
+*.config.js
+*.config.cjs
+
+babel.config.cjs
+eslint.config.js
+jest.config.cjs
+cypress.config.js
+jsdoc.json
+vite.config.js

@@ -2,10 +2,10 @@ name: Build and Test React Application
 
 on:
   push:
-    branches: [master]
+    branches: [main, master]
 
 jobs:
-  build_test:
+  build-and-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -19,7 +19,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          registry-url: 'https://registry.npmjs.org'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
@@ -48,11 +47,6 @@ jobs:
           start: pnpm dev
           wait-on: 'http://localhost:5173/Test_cycle_TDD/'
 
-      - name: Build and publish package on NPM
-        run: cd app && pnpm run build-npm-ci && npm version 0.0.${{ github.run_number }} --no-git-tag-version && npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
@@ -69,8 +63,83 @@ jobs:
         with:
           path: ./app/dist
 
+  publish-npm:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    outputs:
+      should_publish: ${{ steps.version-check.outputs.should_publish }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: cd app && pnpm install --frozen-lockfile
+
+      - name: Check local version against NPM
+        id: version-check
+        run: |
+          SHOULD_PUBLISH=$(node <<'NODE'
+          const fs = require('fs');
+          const { execSync } = require('child_process');
+
+          const pkg = JSON.parse(fs.readFileSync('app/package.json', 'utf8'));
+
+          function parseSemver(version) {
+            return version.split('-')[0].split('.').map((part) => Number.parseInt(part, 10));
+          }
+
+          function isStrictlyGreater(localVersion, publishedVersion) {
+            const [lMajor = 0, lMinor = 0, lPatch = 0] = parseSemver(localVersion);
+            const [pMajor = 0, pMinor = 0, pPatch = 0] = parseSemver(publishedVersion);
+            if (lMajor !== pMajor) return lMajor > pMajor;
+            if (lMinor !== pMinor) return lMinor > pMinor;
+            return lPatch > pPatch;
+          }
+
+          let publishedVersion = null;
+          try {
+            publishedVersion = execSync(`npm view "${pkg.name}" version`, {
+              stdio: ['ignore', 'pipe', 'ignore'],
+            }).toString().trim();
+          } catch {
+            // Package not found on NPM yet: allow first publish.
+            process.stdout.write('true');
+            process.exit(0);
+          }
+
+          process.stdout.write(isStrictlyGreater(pkg.version, publishedVersion) ? 'true' : 'false');
+          NODE
+          )
+          echo "should_publish=${SHOULD_PUBLISH}" >> "$GITHUB_OUTPUT"
+          echo "Bypass publish: ${SHOULD_PUBLISH}"
+
+      - name: Build package for NPM
+        if: steps.version-check.outputs.should_publish == 'true'
+        run: cd app && pnpm run build-npm-ci
+
+      - name: Publish package on NPM
+        if: steps.version-check.outputs.should_publish == 'true'
+        run: cd app && npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Skip publish (version not newer)
+        if: steps.version-check.outputs.should_publish != 'true'
+        run: 'echo "Skip publish: package.json version is not greater than the published NPM version."'
+
   deploy:
-    needs: build_test
+    needs: publish-npm
     permissions:
       pages: write
       id-token: write

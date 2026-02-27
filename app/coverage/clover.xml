@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1771600086106" clover="3.2.0">
+  <project timestamp="1771600086106" name="All files">
+    <metrics statements="123" coveredstatements="123" conditionals="121" coveredconditionals="121" methods="25" coveredmethods="25" elements="269" coveredelements="269" complexity="0" loc="123" ncloc="123" packages="4" files="5" classes="5"/>
+    <package name="components">
+      <metrics statements="43" coveredstatements="43" conditionals="27" coveredconditionals="27" methods="14" coveredmethods="14"/>
+      <file name="PersonForm.jsx" path="D:\Projet dev\IdeaProjects\M1\Test_&_Test_unitaire\Seance1\Test_cycle_TDD\app\src\components\PersonForm.jsx">
+        <metrics statements="43" coveredstatements="43" conditionals="27" coveredconditionals="27" methods="14" coveredmethods="14"/>
+        <line num="23" count="179" type="stmt"/>
+        <line num="32" count="179" type="stmt"/>
+        <line num="42" count="179" type="stmt"/>
+        <line num="43" count="168" type="cond" truecount="2" falsecount="0"/>
+        <line num="44" count="9" type="stmt"/>
+        <line num="45" count="9" type="stmt"/>
+        <line num="48" count="159" type="stmt"/>
+        <line num="49" count="159" type="cond" truecount="6" falsecount="0"/>
+        <line num="51" count="16" type="stmt"/>
+        <line num="52" count="10" type="stmt"/>
+        <line num="54" count="18" type="stmt"/>
+        <line num="55" count="14" type="stmt"/>
+        <line num="57" count="56" type="stmt"/>
+        <line num="58" count="6" type="stmt"/>
+        <line num="60" count="19" type="stmt"/>
+        <line num="61" count="4" type="stmt"/>
+        <line num="63" count="40" type="stmt"/>
+        <line num="64" count="20" type="stmt"/>
+        <line num="66" count="10" type="stmt"/>
+        <line num="67" count="4" type="stmt"/>
+        <line num="69" count="58" type="stmt"/>
+        <line num="71" count="101" type="stmt"/>
+        <line num="82" count="179" type="stmt"/>
+        <line num="83" count="138" type="stmt"/>
+        <line num="84" count="138" type="stmt"/>
+        <line num="85" count="138" type="stmt"/>
+        <line num="95" count="179" type="stmt"/>
+        <line num="96" count="2" type="stmt"/>
+        <line num="97" count="2" type="stmt"/>
+        <line num="98" count="2" type="stmt"/>
+        <line num="106" count="2" type="stmt"/>
+        <line num="107" count="2" type="stmt"/>
+        <line num="108" count="2" type="stmt"/>
+        <line num="111" count="2" type="stmt"/>
+        <line num="112" count="2" type="stmt"/>
+        <line num="132" count="179" type="cond" truecount="7" falsecount="0"/>
+        <line num="134" count="179" type="stmt"/>
+        <line num="146" count="4" type="stmt"/>
+        <line num="159" count="4" type="stmt"/>
+        <line num="172" count="6" type="stmt"/>
+        <line num="185" count="5" type="stmt"/>
+        <line num="198" count="5" type="stmt"/>
+        <line num="211" count="6" type="stmt"/>
+      </file>
+    </package>
+    <package name="domain">
+      <metrics statements="62" coveredstatements="62" conditionals="73" coveredconditionals="73" methods="7" coveredmethods="7"/>
+      <file name="module.js" path="D:\Projet dev\IdeaProjects\M1\Test_&_Test_unitaire\Seance1\Test_cycle_TDD\app\src\domain\module.js">
+        <metrics statements="13" coveredstatements="13" conditionals="10" coveredconditionals="10" methods="1" coveredmethods="1"/>
+        <line num="8" count="20" type="cond" truecount="2" falsecount="0"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="12" count="18" type="cond" truecount="2" falsecount="0"/>
+        <line num="13" count="2" type="stmt"/>
+        <line num="16" count="16" type="cond" truecount="2" falsecount="0"/>
+        <line num="17" count="1" type="stmt"/>
+        <line num="20" count="15" type="cond" truecount="2" falsecount="0"/>
+        <line num="21" count="2" type="stmt"/>
+        <line num="24" count="13" type="cond" truecount="2" falsecount="0"/>
+        <line num="25" count="1" type="stmt"/>
+        <line num="28" count="12" type="stmt"/>
+        <line num="29" count="12" type="stmt"/>
+        <line num="30" count="12" type="stmt"/>
+      </file>
+      <file name="validator.js" path="D:\Projet dev\IdeaProjects\M1\Test_&_Test_unitaire\Seance1\Test_cycle_TDD\app\src\domain\validator.js">
+        <metrics statements="49" coveredstatements="49" conditionals="63" coveredconditionals="63" methods="6" coveredmethods="6"/>
+        <line num="16" count="18" type="cond" truecount="4" falsecount="0"/>
+        <line num="17" count="3" type="stmt"/>
+        <line num="20" count="15" type="cond" truecount="2" falsecount="0"/>
+        <line num="21" count="14" type="cond" truecount="2" falsecount="0"/>
+        <line num="22" count="13" type="cond" truecount="2" falsecount="0"/>
+        <line num="23" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="24" count="11" type="cond" truecount="2" falsecount="0"/>
+        <line num="25" count="10" type="cond" truecount="2" falsecount="0"/>
+        <line num="27" count="9" type="cond" truecount="2" falsecount="0"/>
+        <line num="28" count="8" type="cond" truecount="2" falsecount="0"/>
+        <line num="29" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="30" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="31" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="32" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="34" count="3" type="stmt"/>
+        <line num="35" count="3" type="stmt"/>
+        <line num="36" count="3" type="stmt"/>
+        <line num="37" count="3" type="stmt"/>
+        <line num="38" count="3" type="stmt"/>
+        <line num="39" count="3" type="stmt"/>
+        <line num="41" count="3" type="stmt"/>
+        <line num="57" count="20" type="cond" truecount="4" falsecount="0"/>
+        <line num="58" count="3" type="stmt"/>
+        <line num="61" count="17" type="stmt"/>
+        <line num="62" count="17" type="cond" truecount="2" falsecount="0"/>
+        <line num="64" count="12" type="stmt"/>
+        <line num="65" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="67" count="11" type="stmt"/>
+        <line num="68" count="11" type="cond" truecount="2" falsecount="0"/>
+        <line num="70" count="8" type="stmt"/>
+        <line num="81" count="27" type="cond" truecount="4" falsecount="0"/>
+        <line num="82" count="19" type="stmt"/>
+        <line num="84" count="8" type="stmt"/>
+        <line num="97" count="52" type="cond" truecount="2" falsecount="0"/>
+        <line num="98" count="50" type="cond" truecount="2" falsecount="0"/>
+        <line num="99" count="45" type="cond" truecount="2" falsecount="0"/>
+        <line num="100" count="19" type="stmt"/>
+        <line num="102" count="26" type="stmt"/>
+        <line num="114" count="48" type="cond" truecount="4" falsecount="0"/>
+        <line num="115" count="46" type="cond" truecount="2" falsecount="0"/>
+        <line num="116" count="45" type="cond" truecount="2" falsecount="0"/>
+        <line num="117" count="12" type="cond" truecount="2" falsecount="0"/>
+        <line num="119" count="33" type="stmt"/>
+        <line num="130" count="64" type="cond" truecount="2" falsecount="0"/>
+        <line num="131" count="1" type="stmt"/>
+        <line num="134" count="63" type="stmt"/>
+        <line num="135" count="63" type="cond" truecount="2" falsecount="0"/>
+        <line num="136" count="53" type="stmt"/>
+        <line num="138" count="10" type="stmt"/>
+      </file>
+    </package>
+    <package name="domain.services">
+      <metrics statements="16" coveredstatements="16" conditionals="19" coveredconditionals="19" methods="3" coveredmethods="3"/>
+      <file name="personService.js" path="D:\Projet dev\IdeaProjects\M1\Test_&_Test_unitaire\Seance1\Test_cycle_TDD\app\src\domain\services\personService.js">
+        <metrics statements="16" coveredstatements="16" conditionals="19" coveredconditionals="19" methods="3" coveredmethods="3"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="18" count="4" type="stmt"/>
+        <line num="19" count="4" type="stmt"/>
+        <line num="20" count="3" type="stmt"/>
+        <line num="29" count="2" type="stmt"/>
+        <line num="45" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="46" count="1" type="stmt"/>
+        <line num="49" count="5" type="stmt"/>
+        <line num="50" count="5" type="stmt"/>
+        <line num="51" count="2" type="stmt"/>
+        <line num="53" count="3" type="stmt"/>
+        <line num="55" count="3" type="cond" truecount="4" falsecount="0"/>
+        <line num="56" count="1" type="stmt"/>
+        <line num="59" count="2" type="cond" truecount="4" falsecount="0"/>
+        <line num="60" count="1" type="stmt"/>
+        <line num="63" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="utils">
+      <metrics statements="2" coveredstatements="2" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+      <file name="errorMessages.js" path="D:\Projet dev\IdeaProjects\M1\Test_&_Test_unitaire\Seance1\Test_cycle_TDD\app\src\utils\errorMessages.js">
+        <metrics statements="2" coveredstatements="2" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="17" count="2" type="stmt"/>
+        <line num="38" count="410" type="cond" truecount="2" falsecount="0"/>
+      </file>
+    </package>
+  </project>
+</coverage>

@@ -52,7 +52,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: app/coverage/lcov.info
-          fail_ci_if_error: 'true'
+          fail_ci_if_error: 'false'
 
       - name: Setup Pages
         id: pages

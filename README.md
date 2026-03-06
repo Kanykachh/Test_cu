@@ -129,3 +129,170 @@ pnpm run doc
 - Aucun appel réseau réel : Axios mocké en tests unitaires et cy.intercept en E2E
 - Upload des rapports de couverture vers Codecov
 - Déploiement sur GitHub Pages si tous les tests passentement storage permet de synchroniser l’état entre plusieurs onglets/fenêtres : si un utilisateur est ajouté dans un onglet, la liste se met à jour automatiquement dans les autres.
+
+## Base de données MySQL avec Docker
+
+Le projet contient maintenant une image Docker MySQL initialisée avec un script SQL de migration.
+
+Fichiers ajoutés :
+
+- `Dockerfile`
+- `sqlfiles/migration-v001.sql`
+
+### Contenu de la migration
+
+Le fichier `sqlfiles/migration-v001.sql` crée la base suivante :
+
+```sql
+CREATE DATABASE IF NOT EXISTS ynov_ci;
+```
+
+### Construire l'image
+
+Depuis la racine du projet :
+
+```bash
+docker build -t migration_mysql .
+```
+
+### Lancer le conteneur
+
+```bash
+docker run --name ynov-ci-mysql --env-file .env -p 3306:3306 -d migration_mysql
+```
+
+### Lancer avec Docker Compose
+
+Le projet contient également un fichier `docker-compose.yml` pour démarrer la stack du TP plus facilement.
+
+Construire puis lancer MySQL et l'API :
+
+```bash
+docker compose up -d --build
+```
+
+Arrêter les services :
+
+```bash
+docker compose down
+```
+
+### Vérifier les bases présentes
+
+```bash
+source .env
+docker exec "$(docker compose ps -q mysql)" mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SHOW DATABASES;"
+```
+
+La base `ynov_ci` doit apparaître en plus des bases par défaut de MySQL.
+
+### Import de plusieurs fichiers SQL
+
+Le `Dockerfile` copie maintenant tout le dossier `sqlfiles` dans `/docker-entrypoint-initdb.d/`.
+
+Les scripts sont exécutés dans l'ordre alphabétique. Ici :
+
+- `migration-v001.sql` crée la base `ynov_ci`
+- `migration-v002.sql` sélectionne `ynov_ci` puis crée la table `utilisateur`
+- `migration-v003.sql` insère un utilisateur de démonstration pour le test d'intégration
+
+Vérifier les tables créées :
+
+```bash
+source .env
+docker exec "$(docker compose ps -q mysql)" mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "USE ynov_ci; SHOW TABLES;"
+```
+
+La table `utilisateur` doit apparaître.
+
+### Point important
+
+Les scripts placés dans `/docker-entrypoint-initdb.d/` ne sont exécutés que lors de la première initialisation du conteneur. Si vous relancez un conteneur déjà initialisé, supprimez-le et recréez-le pour rejouer automatiquement la migration.
+
+### Sécurisation minimale
+
+Le mot de passe root n'est plus stocké dans le `Dockerfile`. Il est transmis :
+
+- au runtime avec `docker run --env-file .env`
+- ou via `docker-compose.yml` en lisant `.env`
+
+Exemple de fichier `.env` :
+
+```dotenv
+MYSQL_ROOT_PASSWORD=ynovpwd
+```
+
+Un fichier `.env.example` est fourni comme modèle, et `.env` est ignoré par Git.
+
+## API FastAPI du TP
+
+Pour répondre à la fiche d'activité, une API Python dédiée a été ajoutée dans `api/`.
+
+Structure :
+
+- `api/main.py`
+- `api/requirements.txt`
+- `api/Dockerfile`
+
+L'API expose :
+
+- `GET /health` pour vérifier que le conteneur répond
+- `GET /users` pour lire la table `utilisateur` dans MySQL
+
+### Lancer la stack complète en local
+
+```bash
+docker compose up -d --build
+```
+
+### Vérifier l'API
+
+```bash
+curl http://127.0.0.1:8000/health
+curl http://127.0.0.1:8000/users
+```
+
+Réponse attendue sur `/users` :
+
+```json
+{
+  "utilisateurs": [
+    {
+      "id": 1,
+      "nom": "Alice Martin",
+      "email": "alice.martin@example.com"
+    }
+  ]
+}
+```
+
+## CI/CD du TP
+
+Un workflow GitHub Actions dédié a été ajouté :
+
+- `.github/workflows/api-ci.yml`
+
+Le pipeline suit l'ordre demandé dans la fiche :
+
+1. build de l'image MySQL
+2. build de l'image API
+3. lancement de MySQL
+4. attente active du démarrage
+5. lancement de l'API
+6. test `curl` sur `/users`
+7. échec si la réponse n'est pas `200` ou si la liste est vide
+8. push de l'image API sur Docker Hub uniquement si la validation réussit
+
+### Secrets GitHub à configurer
+
+Pour éviter tout secret en clair dans le YAML, il faut configurer :
+
+- `MYSQL_ROOT_PASSWORD`
+- `DOCKERHUB_USERNAME`
+- `DOCKERHUB_TOKEN`
+
+## Liens utiles pour le rendu
+
+- Dépôt GitHub : `https://github.com/Kanykachh/Test_cu`
+- Image Docker Hub MySQL déjà publiée : `https://hub.docker.com/r/kanykaa/migration_mysql`
+- Image Docker Hub API : `https://hub.docker.com/r/kanykaa/fastapi-users-api`

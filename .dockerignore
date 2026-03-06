@@ -1,0 +1,9 @@
+app/node_modules
+app/dist
+app/coverage
+.git
+.idea
+.DS_Store
+.env
+__pycache__
+api/__pycache__

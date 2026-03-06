@@ -1,0 +1,125 @@
+name: API Python CI/CD
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  validate-and-publish-api:
+    runs-on: ubuntu-latest
+    env:
+      MYSQL_IMAGE_NAME: migration_mysql
+      API_IMAGE_NAME: fastapi-users-api
+      MYSQL_CONTAINER_NAME: ci-mysql
+      API_CONTAINER_NAME: ci-api
+      DOCKER_NETWORK: ci-network
+      MYSQL_DATABASE: ynov_ci
+      MYSQL_USER: root
+      MYSQL_HOST: ci-mysql
+      MYSQL_PORT: 3306
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build MySQL image
+        run: docker build -t "$MYSQL_IMAGE_NAME" .
+
+      - name: Build API image
+        run: docker build -t "$API_IMAGE_NAME" ./api
+
+      - name: Create Docker network
+        run: docker network create "$DOCKER_NETWORK"
+
+      - name: Start MySQL container
+        run: |
+          docker run -d \
+            --name "$MYSQL_CONTAINER_NAME" \
+            --network "$DOCKER_NETWORK" \
+            -e MYSQL_ROOT_PASSWORD="${{ secrets.MYSQL_ROOT_PASSWORD }}" \
+            -e MYSQL_DATABASE="$MYSQL_DATABASE" \
+            "$MYSQL_IMAGE_NAME"
+
+      - name: Wait for MySQL
+        run: |
+          for attempt in $(seq 1 30); do
+            if docker exec "$MYSQL_CONTAINER_NAME" mysqladmin ping -h 127.0.0.1 -uroot -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" --silent; then
+              echo "MySQL is ready."
+              exit 0
+            fi
+            echo "Waiting for MySQL... ($attempt/30)"
+            sleep 2
+          done
+          echo "MySQL did not become ready in time."
+          docker logs "$MYSQL_CONTAINER_NAME"
+          exit 1
+
+      - name: Start API container
+        run: |
+          docker run -d \
+            --name "$API_CONTAINER_NAME" \
+            --network "$DOCKER_NETWORK" \
+            -p 8000:8000 \
+            -e MYSQL_HOST="$MYSQL_HOST" \
+            -e MYSQL_DATABASE="$MYSQL_DATABASE" \
+            -e MYSQL_USER="$MYSQL_USER" \
+            -e MYSQL_PASSWORD="${{ secrets.MYSQL_ROOT_PASSWORD }}" \
+            -e MYSQL_PORT="$MYSQL_PORT" \
+            "$API_IMAGE_NAME"
+
+      - name: Wait for API
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8000/health > /dev/null; then
+              echo "API is ready."
+              exit 0
+            fi
+            echo "Waiting for API... ($attempt/30)"
+            sleep 2
+          done
+          echo "API did not become ready in time."
+          docker logs "$API_CONTAINER_NAME"
+          exit 1
+
+      - name: Validate /users endpoint
+        run: |
+          RESPONSE=$(curl --fail --silent http://127.0.0.1:8000/users)
+          echo "$RESPONSE"
+          API_RESPONSE="$RESPONSE" python <<'PY'
+          import json
+          import os
+
+          payload = json.loads(os.environ["API_RESPONSE"])
+          users = payload.get("utilisateurs", [])
+
+          if not isinstance(users, list):
+              raise SystemExit("The /users response does not contain a list.")
+
+          if not users:
+              raise SystemExit("The /users endpoint returned an empty list.")
+
+          print(f"Validation passed with {len(users)} user(s).")
+          PY
+
+      - name: Login to Docker Hub
+        if: github.event_name == 'push' && (github.ref_name == 'main' || github.ref_name == 'master')
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push API image to Docker Hub
+        if: github.event_name == 'push' && (github.ref_name == 'main' || github.ref_name == 'master')
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          docker tag "$API_IMAGE_NAME" "${{ secrets.DOCKERHUB_USERNAME }}/fastapi-users-api:latest"
+          docker tag "$API_IMAGE_NAME" "${{ secrets.DOCKERHUB_USERNAME }}/fastapi-users-api:${SHORT_SHA}"
+          docker push "${{ secrets.DOCKERHUB_USERNAME }}/fastapi-users-api:latest"
+          docker push "${{ secrets.DOCKERHUB_USERNAME }}/fastapi-users-api:${SHORT_SHA}"
+
+      - name: Cleanup containers
+        if: always()
+        run: |
+          docker rm -f "$API_CONTAINER_NAME" "$MYSQL_CONTAINER_NAME" 2>/dev/null || true
+          docker network rm "$DOCKER_NETWORK" 2>/dev/null || true
